@@ -332,23 +332,24 @@ export default function App() {
         <LoadingProvider>
           <AuthProvider>
             <LanguageProvider>
-            <ErrorBoundary>
-              <AppContent 
-                slipData={slipData}
-                onUpdateSlip={setSlipData}
-                view={view}
-                onNavigate={setView}
-                employees={employees}
-                onViewSlip={handleViewSlip}
-                onAddEmployee={handleAddEmployee}
-                onCreateSlip={handleCreateSlip}
-                exportMessage={exportMsg}
-                onExport={handleExportPDF}
-              />
-              <ToastContainer />
-            </ErrorBoundary>
-          </LanguageProvider>
-        </AuthProvider>
+              <ErrorBoundary>
+                <AppContent 
+                  slipData={slipData}
+                  onUpdateSlip={setSlipData}
+                  view={view}
+                  onNavigate={setView}
+                  employees={employees}
+                  onViewSlip={handleViewSlip}
+                  onAddEmployee={handleAddEmployee}
+                  onCreateSlip={handleCreateSlip}
+                  exportMessage={exportMsg}
+                  onExport={handleExportPDF}
+                />
+                <ToastContainer />
+              </ErrorBoundary>
+            </LanguageProvider>
+          </AuthProvider>
+        </LoadingProvider>
       </ToastProvider>
     </ThemeProvider>
   );
