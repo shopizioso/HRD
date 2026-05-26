@@ -8,6 +8,7 @@ import SettingsPage from "./pages/SettingsPage";
 import FinancialPage from "./pages/FinancialPage-Minimalist";
 import IncomePage from "./pages/IncomePage-Minimalist";
 import { useAutoSaveSlip } from "./hooks/useAutoSaveSlip";
+import { getEmployees, createEmployee as createEmployeeSvc, updateEmployee as updateEmployeeSvc, onEmployeesRealtime } from "./services/employeesService";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ToastProvider } from "./context/ToastContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -86,34 +87,126 @@ export default function App() {
     }
     return createSlipState(INITIAL_EMPLOYEES[0]);
   });
+
+  const autosave = useAutoSaveSlip(slipData, () => {});
+
+  const useSupabase = Boolean(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
+
+  // Map Supabase employee row to app shape
+  const mapEmployee = (e) => ({
+    id: e.id,
+    name: e.full_name || e.name || '',
+    position: e.position || '',
+    department: e.department || '',
+    baseSalary: e.salary || e.baseSalary || 0,
+  });
+
+  // Fetch employees from Supabase when configured and subscribe to realtime changes
+  useEffect(() => {
+    if (!useSupabase) return;
+    let mounted = true;
+    (async () => {
+      try {
+        const rows = await getEmployees();
+        if (!mounted) return;
+        if (Array.isArray(rows) && rows.length > 0) {
+          setEmployees(rows.map(mapEmployee));
+        }
+      } catch (err) {
+        console.error('Failed to load employees from Supabase', err);
+      }
+    })();
+
+    const unsub = onEmployeesRealtime((payload) => {
+      // payload example: { eventType: 'INSERT'|'UPDATE'|'DELETE', new: {...}, old: {...} }
+      try {
+        const e = payload.record || payload.new || payload;
+        const type = payload.eventType || payload.event || (payload.type || null);
+        if (!e) return;
+        if (type === 'DELETE' || payload.event === 'DELETE') {
+          setEmployees((prev) => prev.filter((it) => it.id !== e.id));
+        } else {
+          const mapped = mapEmployee(e);
+          setEmployees((prev) => {
+            const found = prev.find((p) => p.id === mapped.id);
+            if (found) return prev.map((p) => (p.id === mapped.id ? { ...p, ...mapped } : p));
+            return [...prev, mapped];
+          });
+        }
+      } catch (e) {
+        console.error('Realtime employee handler error', e);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      try { if (unsub) unsub(); } catch (e) {}
+    };
+  }, []);
   const [exportMsg, setExportMsg] = useState("");
   const [selectedMonth] = useState(5);
   const [selectedYear] = useState(2026);
 
   useEffect(() => {
     try {
-      localStorage.setItem('employeesData', JSON.stringify(employees));
+      if (!useSupabase) {
+        localStorage.setItem('employeesData', JSON.stringify(employees));
+      }
     } catch (e) {
       console.error('Failed to persist employees:', e);
     }
   }, [employees]);
 
   const handleAddEmployee = (employee) => {
-    const nextId = employees.reduce((max, item) => Math.max(max, item.id || 0), 0) + 1;
-    setEmployees((prev) => [
-      ...prev,
-      {
-        id: nextId,
-        name: employee.name,
-        position: employee.position,
-        department: employee.department,
-        baseSalary: Number(employee.baseSalary || 0),
-      },
-    ]);
+    if (useSupabase) {
+      (async () => {
+        try {
+          const [created] = await createEmployeeSvc({
+            full_name: employee.name,
+            position: employee.position,
+            department: employee.department,
+            salary: Number(employee.baseSalary || 0),
+            status: 'active',
+          });
+          if (created) setEmployees((prev) => [...prev, mapEmployee(created)]);
+        } catch (err) {
+          console.error('Failed to create employee in Supabase', err);
+        }
+      })();
+    } else {
+      const nextId = employees.reduce((max, item) => Math.max(max, item.id || 0), 0) + 1;
+      setEmployees((prev) => [
+        ...prev,
+        {
+          id: nextId,
+          name: employee.name,
+          position: employee.position,
+          department: employee.department,
+          baseSalary: Number(employee.baseSalary || 0),
+        },
+      ]);
+    }
   };
 
   const handleUpdateEmployee = (updatedEmployee) => {
-    setEmployees((prev) => prev.map((item) => (item.id === updatedEmployee.id ? { ...item, ...updatedEmployee } : item)));
+    if (useSupabase) {
+      (async () => {
+        try {
+          const [updated] = await updateEmployeeSvc({
+            id: updatedEmployee.id,
+            full_name: updatedEmployee.name,
+            position: updatedEmployee.position,
+            department: updatedEmployee.department,
+            salary: Number(updatedEmployee.baseSalary || 0),
+          });
+          if (updated) setEmployees((prev) => prev.map((item) => (item.id === updated.id ? mapEmployee(updated) : item)));
+        } catch (err) {
+          console.error('Failed to update employee in Supabase', err);
+        }
+      })();
+    } else {
+      setEmployees((prev) => prev.map((item) => (item.id === updatedEmployee.id ? { ...item, ...updatedEmployee } : item)));
+    }
   };
 
   const loadScript = (src) =>
@@ -209,21 +302,15 @@ export default function App() {
   };
 
   const handleViewSlip = (employee) => {
-    // Check if there's already saved data for this employee
-    const saved = localStorage.getItem('payrollSlip_autosave');
-    if (saved) {
-      try {
-        const savedData = JSON.parse(saved);
-        // If saved data is for this employee, use it; otherwise create fresh
-        if (savedData.employee && savedData.employee.id === employee.id) {
-          setSlipData(savedData);
-        } else {
-          setSlipData(createSlipState(employee));
-        }
-      } catch (e) {
+    // Check if there's already saved data for this employee (uses autosave hook/load)
+    try {
+      const saved = autosave.load();
+      if (saved && saved.employee && saved.employee.id === employee.id) {
+        setSlipData(saved);
+      } else {
         setSlipData(createSlipState(employee));
       }
-    } else {
+    } catch (e) {
       setSlipData(createSlipState(employee));
     }
     setView("slip");
