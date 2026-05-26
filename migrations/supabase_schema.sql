@@ -91,3 +91,13 @@ CREATE TABLE IF NOT EXISTS liabilities (
   status text,
   created_at timestamptz DEFAULT now()
 );
+
+-- profiles (per-user preferences)
+CREATE TABLE IF NOT EXISTS profiles (
+  id uuid PRIMARY KEY,
+  full_name text,
+  email text,
+  avatar text,
+  metadata jsonb,
+  created_at timestamptz DEFAULT now()
+);

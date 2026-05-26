@@ -13,6 +13,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { ToastProvider } from "./context/ToastContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { LanguageProvider } from "./context/LanguageContext";
+import { LoadingProvider } from "./context/LoadingContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ToastContainer } from "./components/ToastContainer";
@@ -328,8 +329,9 @@ export default function App() {
   return (
     <ThemeProvider>
       <ToastProvider>
-        <AuthProvider>
-          <LanguageProvider>
+        <LoadingProvider>
+          <AuthProvider>
+            <LanguageProvider>
             <ErrorBoundary>
               <AppContent 
                 slipData={slipData}
