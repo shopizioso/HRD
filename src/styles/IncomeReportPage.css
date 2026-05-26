@@ -1,0 +1,275 @@
+.income-report {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border-radius: 12px;
+  color: white;
+}
+
+.report-header h1 {
+  margin: 0 0 4px 0;
+  font-size: 2em;
+}
+
+.report-header p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 0.95em;
+}
+
+.header-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.month-input {
+  padding: 12px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 0.95em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.month-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: white;
+}
+
+.month-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.summary-card {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  background: var(--surface);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  align-items: flex-start;
+  transition: all 0.2s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-icon {
+  font-size: 2em;
+  flex-shrink: 0;
+}
+
+.card-content {
+  flex: 1;
+}
+
+.card-label {
+  font-size: 0.85em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.card-value {
+  font-size: 1.8em;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.card-subtext {
+  font-size: 0.8em;
+  color: var(--text-muted);
+}
+
+.marketplace-detail {
+  padding: 24px;
+  background: var(--surface);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.marketplace-detail h2 {
+  margin: 0 0 16px 0;
+  font-size: 1.3em;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.detail-table thead {
+  background: var(--background);
+  border-bottom: 2px solid var(--border);
+}
+
+.detail-table th {
+  padding: 14px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 0.8em;
+  letter-spacing: 0.5px;
+}
+
+.detail-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-table tbody tr:hover {
+  background-color: var(--background);
+}
+
+.analysis-section {
+  padding: 24px;
+  background: var(--surface);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.analysis-section h2 {
+  margin: 0 0 16px 0;
+  font-size: 1.3em;
+}
+
+.analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.analysis-card {
+  padding: 20px;
+  background: var(--background);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.analysis-title {
+  font-size: 1.1em;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.insight-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.insight-list li {
+  padding: 12px;
+  background: var(--surface);
+  border-radius: 6px;
+  border-left: 3px solid #667eea;
+  font-size: 0.95em;
+  line-height: 1.5;
+}
+
+.insight-list strong {
+  color: var(--text);
+}
+
+.commission-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: var(--surface);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.info-item span {
+  color: var(--text-muted);
+  font-size: 0.9em;
+}
+
+.info-item strong {
+  font-size: 1.1em;
+  color: var(--text);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .report-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .analysis-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-table {
+    font-size: 0.85em;
+  }
+
+  .detail-table th,
+  .detail-table td {
+    padding: 10px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-table {
+    font-size: 0.75em;
+  }
+
+  .detail-table th,
+  .detail-table td {
+    padding: 8px 6px;
+  }
+
+  .card-value {
+    font-size: 1.3em;
+  }
+}

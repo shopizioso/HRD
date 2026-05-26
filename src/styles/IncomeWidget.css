@@ -1,0 +1,188 @@
+.income-widget {
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.widget-header h3 {
+  margin: 0;
+  font-size: 1.3em;
+}
+
+.btn-refresh {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-refresh:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(180deg);
+}
+
+.widget-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.stat-card.today {
+  border-left: 3px solid #fbbf24;
+}
+
+.stat-card.month {
+  border-left: 3px solid #10b981;
+}
+
+.stat-label {
+  font-size: 0.85em;
+  opacity: 0.9;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 1.6em;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.stat-subtext {
+  font-size: 0.8em;
+  opacity: 0.85;
+}
+
+.widget-top-marketplace {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.label {
+  font-size: 0.9em;
+  font-weight: 600;
+}
+
+.marketplace-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 2px solid;
+  font-size: 0.9em;
+  font-weight: 600;
+}
+
+.widget-chart {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.chart-label {
+  font-size: 0.9em;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.mini-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 80px;
+  gap: 4px;
+}
+
+.mini-bar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.mini-bar {
+  width: 100%;
+  min-height: 4px;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.mini-bar:hover {
+  opacity: 0.8;
+  transform: scaleY(1.1);
+}
+
+.mini-bar-label {
+  font-size: 0.7em;
+  opacity: 0.7;
+}
+
+.btn-quick-add {
+  width: 100%;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95em;
+}
+
+.btn-quick-add:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: white;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 640px) {
+  .income-widget {
+    padding: 16px;
+  }
+
+  .widget-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .mini-bars {
+    height: 60px;
+  }
+}
