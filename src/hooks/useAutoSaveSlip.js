@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { upsertRow } from '../lib/supabase';
 
 const STORAGE_KEY = 'payrollSlip_autosave';
 const SAVE_DELAY = 500; // milliseconds
@@ -7,28 +8,31 @@ export function useAutoSaveSlip(slipData, onSave) {
   const saveTimeoutRef = useRef(null);
   const lastSavedRef = useRef(null);
 
+  const useSupabase = Boolean(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
+
   useEffect(() => {
     if (!slipData) return;
 
-    // Clear previous timeout
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
 
-    // Check if data actually changed
     const currentJson = JSON.stringify(slipData);
     if (lastSavedRef.current === currentJson) {
       return;
     }
 
-    // Set new timeout for debounced save
-    saveTimeoutRef.current = setTimeout(() => {
+    saveTimeoutRef.current = setTimeout(async () => {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(slipData));
-        lastSavedRef.current = currentJson;
-        if (onSave) {
-          onSave();
+        if (useSupabase) {
+          // upsert to payrolls table; rely on `id` when present
+          await upsertRow('payrolls', { ...slipData });
+        } else {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(slipData));
         }
+
+        lastSavedRef.current = currentJson;
+        if (onSave) onSave();
       } catch (error) {
         console.error('Failed to auto-save:', error);
       }
@@ -42,12 +46,16 @@ export function useAutoSaveSlip(slipData, onSave) {
   }, [slipData, onSave]);
 
   return {
-    save: () => {
+    save: async () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(slipData));
+        if (useSupabase) {
+          await upsertRow('payrolls', { ...slipData });
+        } else {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(slipData));
+        }
         lastSavedRef.current = JSON.stringify(slipData);
       } catch (error) {
         console.error('Failed to save:', error);
@@ -55,6 +63,10 @@ export function useAutoSaveSlip(slipData, onSave) {
     },
     load: () => {
       try {
+        if (useSupabase) {
+          // Loading from Supabase should be done via service (not here)
+          return null;
+        }
         const saved = localStorage.getItem(STORAGE_KEY);
         return saved ? JSON.parse(saved) : null;
       } catch (error) {
@@ -62,10 +74,15 @@ export function useAutoSaveSlip(slipData, onSave) {
         return null;
       }
     },
-    clear: () => {
+    clear: async () => {
       try {
-        localStorage.removeItem(STORAGE_KEY);
-        lastSavedRef.current = null;
+        if (useSupabase) {
+          // clearing server-side autosave is a no-op here; use service to delete if needed
+          lastSavedRef.current = null;
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+          lastSavedRef.current = null;
+        }
       } catch (error) {
         console.error('Failed to clear:', error);
       }
